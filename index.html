@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    
+    <script src="js/unmute-ios-audio/unmute-ios-audio.js"></script>
+    
+    <script>
+        unmuteIosAudio();   
+  </script>
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>The YUSIMRY(tm) Pen</title>
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link href="6483738bedd883892f331c2a_yusimry_favicon.png" rel="shortcut icon" type="image/x-icon"/>
+
+
+
+  </head>
+  <body style="text-align: center">
+  
+    <div id="yus-container" class="yus-desktop">
+        <canvas id="yus-canvas" class="yus-desktop"></canvas>
+        <div id="noWebGL"><p>Sorry, this experience is not supported on your device.</p><p>Please visit this page with another device or browser.</p></div>
+        <div id="yus-loading-bar">
+            <div id="yus-progress-bar-empty">
+                <div id="yus-progress-bar-full"></div>
+            </div>
+            <div id="yus-loading-copy">Loading</div>
+        </div>
+    </div>
+    <script src="Build/HCP-WebGL.loader.js"></script>
+    <script>
+
+    function OpenPI()
+    {
+        window.open('https://assets.website-files.com/6483738bedd883892f331b8d/649b9de6f7a9929ae8e05dca_PI_PMD-0051_R02_V05_FDA.pdf');
+    }
+
+    function OpenMG()
+    {
+        window.open('https://assets.website-files.com/6483738bedd883892f331b8d/649b9e33e8165d056c9ad0aa_MG_PMD-0050_R02_FDA.pdf');
+    }
+
+    function OpenIFU()
+    {
+        window.open('https://assets.website-files.com/6483738bedd883892f331b8d/6483738bedd883892f331c24_IFU_PMD-0044_R01-24b6d636.pdf');
+    }
+
+    function detectWebGL()
+	{
+		// Check for the WebGL rendering context
+		if ( !! window.WebGLRenderingContext) {
+			var canvas = document.createElement("canvas"),
+				names = ["webgl", "experimental-webgl", "moz-webgl", "webkit-3d"],
+				context = false;
+			for (var i in names) {
+				try {
+					context = canvas.getContext(names[i]);
+					if (context && typeof context.getParameter === "function") {
+						// WebGL is enabled.
+						return 1;
+					}
+				} catch (e) {}
+			}
+
+			// WebGL is supported, but disabled.
+			return 0;
+		}
+
+		// WebGL not supported.
+		return -1;
+	};
+
+    var config = {
+        dataUrl: "Build/HCP-WebGL.data",
+                frameworkUrl: "Build/HCP-WebGL.framework.js",
+                codeUrl: "Build/HCP-WebGL.wasm",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Coherus",
+        productName: "YUSIMRY",
+        productVersion: "1.0",
+    };
+
+    let isIpad = /Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || isIpad) {
+        // Mobile device style: fill the whole browser client area with the game canvas:
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        config.dataUrl = 'Build/HCP-WebGL-m.data';
+
+    }
+     
+
+    var canvas = document.querySelector("#yus-canvas");
+    var loadingBar = document.querySelector("#yus-loading-bar");
+    var progressBarFull = document.querySelector("#yus-progress-bar-full");
+    var unity=null;
+
+
+
+    if (detectWebGL()==1)
+    {
+        setInterval(function() {
+        if (typeof TOTAL_MEMORY !== 'undefined') {
+        try {
+            var totalMem = TOTAL_MEMORY/1024.0/1024.0;
+            var usedMem = (TOTAL_STACK + (STATICTOP - STATIC_BASE) + 
+                        (DYNAMICTOP - DYNAMIC_BASE))/1024.0/1024.0;
+            console.log('Memory stats - used: ' + Math.ceil(usedMem) + 'M' + 
+                        ' free: ' + Math.floor(totalMem - usedMem) + 'M');
+        } catch(e) {}
+        }
+        }, 5000);
+
+        loadingBar.style.display = "block";
+
+        createUnityInstance(canvas, config, (progress) => {
+                    progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+            unity = unityInstance;
+            loadingBar.style.display = "none";
+        }).catch((message) => {
+            alert(message);
+        });
+    }
+    else {
+        loadingBar.style.display = "none";
+        noWebGL.style.display = "block";
+        canvas.style.display = "none";
+    }
+
+    </script>
+  </body>
+</html>
